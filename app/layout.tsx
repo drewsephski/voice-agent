@@ -1,115 +1,81 @@
-import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { ThemeProvider } from "next-themes";
+import { cn } from "@/lib/utils";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-};
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: {
-    default: "Vapi Chat Demo | Professional Voice AI Assistant Interface",
-    template: "%s | Vapi AI",
-  },
-  description:
-    "Experience the future of conversational AI with Vapi's professional chat demo. Built with Next.js and the latest AI SDK for seamless voice assistant interactions.",
-  keywords: [
-    "Vapi",
-    "Voice AI assistant",
-    "conversational AI",
-    "voice chat",
-    "AI chatbot",
-    "voice interface",
-    "AI SDK",
-    "Next.js",
-    "real-time chat",
-    "voice technology",
-  ],
-  authors: [{ name: "Vapi AI", url: "https://vapi.ai" }],
-  creator: "Vapi AI",
-  publisher: "Vapi AI",
-  category: "Technology",
-  metadataBase: new URL("https://chat.vapi.ai"),
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://chat.vapi.ai",
-    siteName: "Vapi Chat Demo",
-    title: "Vapi Chat Demo | Professional Voice AI Assistant Interface",
-    description:
-      "Experience the future of conversational AI with Vapi's professional chat demo. Built with Next.js and the latest AI SDK for seamless voice assistant interactions.",
-  },
-  twitter: {
-    card: "summary_large_image",
-    site: "@vapi_ai",
-    creator: "@vapi_ai",
-    title: "Vapi Chat Demo | Professional Voice AI Assistant Interface",
-    description:
-      "Experience the future of conversational AI with Vapi's professional chat demo.",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
-  manifest: "/site.webmanifest",
-  other: {
-    "msapplication-TileColor": "#000000",
-    "theme-color": "#ffffff",
-  },
+  title: "Dream Chat",
+  description: "Dark, modern AI chat with integrated pricing.",
 };
+
+function ThemeToggle() {
+  // Inline client component for header toggle
+  if (typeof window === "undefined") return null;
+  // Lazy import next-themes hook to avoid server usage
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { useTheme } = require("next-themes");
+  const { theme, setTheme } = useTheme();
+
+  const isDark = theme === "dark" || theme === "system";
+
+  return (
+    <button
+      type="button"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      className={cn(
+        "inline-flex h-8 w-8 items-center justify-center rounded-full border text-xs transition-colors",
+        "border-zinc-700/70 bg-zinc-900/80 text-zinc-200 hover:bg-zinc-800",
+        "dark:border-zinc-700/80 dark:bg-zinc-900/90 dark:text-zinc-100",
+      )}
+      aria-label="Toggle theme"
+    >
+      {isDark ? "☾" : "☼"}
+    </button>
+  );
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link rel="dns-prefetch" href="https://api.vapi.ai" />
-        <meta name="format-detection" content="telephone=no" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Vapi Chat" />
-      </head>
+    <html suppressHydrationWarning lang="en">
       <body
-        className={`font-sans antialiased bg-background text-foreground selection:bg-primary/20`}
-        suppressHydrationWarning
+        className={cn(
+          inter.className,
+          "bg-background text-foreground antialiased",
+        )}
       >
-        <div className="relative flex min-h-screen flex-col">
-          <main className="flex-1">{children}</main>
-        </div>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="min-h-screen bg-background text-foreground">
+            <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/70 backdrop-blur-md">
+              <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 lg:px-6">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-primary/15 text-primary text-xs font-semibold">
+                    D
+                  </div>
+                  <div className="flex flex-col leading-tight">
+                    <span className="text-sm font-semibold">Dream</span>
+                    <span className="text-[10px] text-muted-foreground">
+                      AI chat & pricing
+                    </span>
+                  </div>
+                </div>
+                <ThemeToggle />
+              </div>
+            </header>
+            {children}
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );
