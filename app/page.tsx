@@ -18,7 +18,6 @@ import {
   Bot,
   CheckCircle2,
   Loader2,
-  MessageCircle,
   Send,
   User,
 } from "lucide-react";
@@ -182,7 +181,7 @@ export default function Dream() {
               <p>Plug into any Vapi assistant and hand this UI to your clients.</p>
               <ul className="space-y-1.5">
                 <li>• Self-hosted and brandable.</li>
-                <li>• Uses your client's own Vapi keys.</li>
+                <li>• Uses your client&apos;s own Vapi keys.</li>
                 <li>• Modern, production-ready UX.</li>
               </ul>
             </CardContent>
@@ -456,10 +455,6 @@ export default function Dream() {
                 Backend remains unchanged: <code className="text-indigo-300">/api/chat</code> proxies to
                 <code className="ml-1 text-indigo-300">https://api.vapi.ai/chat</code> using provided keys.
               </p>
-      {/* Pricing section on landing page */}
-      <section className="mt-24">
-        {/* Import-level component reference */}
-      </section>
             </CardContent>
           </Card>
         </aside>
