@@ -32,20 +32,11 @@ export async function GET(request: NextRequest) {
 
   // Validate configuration robustness:
   // - Require access token
-  // - Require NEXT_PUBLIC_APP_URL
   // - Require at least one valid mapped product ID
   if (!env.POLAR_ACCESS_TOKEN) {
     console.error('[polar][checkout] Missing POLAR_ACCESS_TOKEN');
     return Response.json(
       { error: 'Polar checkout misconfigured: missing POLAR_ACCESS_TOKEN' },
-      { status: 500 }
-    );
-  }
-
-  if (!env.NEXT_PUBLIC_APP_URL) {
-    console.error('[polar][checkout] Missing NEXT_PUBLIC_APP_URL');
-    return Response.json(
-      { error: 'Polar checkout misconfigured: missing NEXT_PUBLIC_APP_URL' },
       { status: 500 }
     );
   }
@@ -83,8 +74,14 @@ export async function GET(request: NextRequest) {
     url.searchParams.append('products', id);
   }
 
-  const successUrl = `${env.NEXT_PUBLIC_APP_URL}/dashboard?checkoutId={CHECKOUT_ID}`;
-  const returnUrl = `${env.NEXT_PUBLIC_APP_URL}/checkout/error`;
+  // Derive base URL from NEXT_PUBLIC_APP_URL if present, otherwise from the request URL.
+  // This prevents hard failure when NEXT_PUBLIC_APP_URL is missing in some environments.
+  const appBase =
+    env.NEXT_PUBLIC_APP_URL ||
+    `${url.protocol}//${url.host}`;
+
+  const successUrl = `${appBase}/dashboard?checkoutId={CHECKOUT_ID}`;
+  const returnUrl = `${appBase}/checkout/error`;
 
   // Final sanity check to avoid "Invalid URL" from undefined/empty pieces
   try {
