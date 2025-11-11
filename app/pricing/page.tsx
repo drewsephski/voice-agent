@@ -20,14 +20,14 @@ import {
   HelpCircle,
 } from "lucide-react";
 import Link from "next/link";
-const monthlyPrice = 7.99;
-const originalMonthlyPrice = 12.99;
+const monthlyPrice = 27.99; // Starter subscription (Polar)
+const originalMonthlyPrice = 39.99; // Anchor "was" price for display only
 const monthlyDiscount = Math.round(
   ((originalMonthlyPrice - monthlyPrice) / originalMonthlyPrice) * 100
 );
 
-const oneTimePrice = 79.99;
-const yearlyPrice = monthlyPrice * 12;
+const oneTimePrice = 117.99; // One-time license (Polar)
+const yearlyPrice = originalMonthlyPrice * 12; // Baseline for strike-through
 const oneTimeDiscount = Math.round(
   ((yearlyPrice - oneTimePrice) / yearlyPrice) * 100
 );

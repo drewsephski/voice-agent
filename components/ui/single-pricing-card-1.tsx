@@ -12,15 +12,25 @@ import { cn } from '@/lib/utils';
 import { BorderTrail } from './border-trail';
 
 export function Pricing() {
-  // Pricing data with accurate calculations
-  const monthlyPrice = 7.99;
-  const originalMonthlyPrice = 12.99;
-  const monthlyDiscount = Math.round(((originalMonthlyPrice - monthlyPrice) / originalMonthlyPrice) * 100);
-  
-  // One-time purchase price (equivalent to ~12 months with additional discount)
-  const oneTimePrice = 79.99;
-  const yearlyPrice = monthlyPrice * 12;
-  const oneTimeDiscount = Math.round(((yearlyPrice - oneTimePrice) / yearlyPrice) * 100);
+  // Polar-backed Starter pricing
+  // Display: $27.99/month Starter subscription
+  const monthlyPrice = 27.99;
+
+  // Keep a subtle “was” price for social proof (adjust if desired)
+  const originalMonthlyPrice = 39.99;
+  const monthlyDiscount = Math.round(
+    ((originalMonthlyPrice - monthlyPrice) / originalMonthlyPrice) * 100
+  );
+
+  // Polar-backed one-time license
+  // Display: $117.99 one-time purchase
+  const oneTimePrice = 117.99;
+
+  // Derive a notional yearly baseline from original monthly for strikethrough
+  const yearlyPrice = originalMonthlyPrice * 12;
+  const oneTimeDiscount = Math.round(
+    ((yearlyPrice - oneTimePrice) / yearlyPrice) * 100
+  );
 
   return (
     <section className="relative min-h-screen overflow-hidden py-24">
@@ -70,7 +80,7 @@ export function Pricing() {
               <div className="w-full px-4 pt-5 pb-4">
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="leading-none font-semibold text-foreground">Monthly</h3>
+                    <h3 className="leading-none font-semibold text-foreground">Starter (Monthly)</h3>
                     <div className="flex items-center gap-x-1">
                       <span className="text-muted-foreground text-sm line-through">${originalMonthlyPrice.toFixed(2)}</span>
                       <TechBadge variant="premium" iconPosition="right">{monthlyDiscount}% off</TechBadge>
@@ -101,7 +111,7 @@ export function Pricing() {
                 />
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="leading-none font-semibold text-foreground">One-time purchase</h3>
+                    <h3 className="leading-none font-semibold text-foreground">One-time license</h3>
                     <div className="flex items-center gap-x-1">
                       <span className="text-muted-foreground text-sm line-through">${yearlyPrice.toFixed(2)}</span>
                       <TechBadge variant="premium" iconPosition="right">Save {oneTimeDiscount}%</TechBadge>
