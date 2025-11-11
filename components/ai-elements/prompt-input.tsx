@@ -545,6 +545,7 @@ export const PromptInput = ({
     ? (files: File[] | FileList) => controller.attachments.add(files)
     : addLocal;
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const remove = usingProvider
     ? (id: string) => controller.attachments.remove(id)
     : (id: string) =>
@@ -556,6 +557,7 @@ export const PromptInput = ({
           return prev.filter((file) => file.id !== id);
         });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const clear = usingProvider
     ? () => controller.attachments.clear()
     : () =>
@@ -568,6 +570,7 @@ export const PromptInput = ({
           return [];
         });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const openFileDialog = usingProvider
     ? () => controller.attachments.openFileDialog()
     : openFileDialogLocal;
@@ -695,6 +698,7 @@ export const PromptInput = ({
 
     // Convert blob URLs to data URLs asynchronously
     Promise.all(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       files.map(async ({ id, ...item }) => {
         if (item.url && item.url.startsWith("blob:")) {
           return {
@@ -727,6 +731,7 @@ export const PromptInput = ({
             controller.textInput.clear();
           }
         }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         // Don't clear on error - user may want to retry
       }
@@ -1023,12 +1028,16 @@ interface SpeechRecognition extends EventTarget {
   lang: string;
   start(): void;
   stop(): void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onstart: ((this: SpeechRecognition, ev: Event) => any) | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onend: ((this: SpeechRecognition, ev: Event) => any) | null;
   onresult:
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     | ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => any)
     | null;
   onerror:
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     | ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => any)
     | null;
 }
