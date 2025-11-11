@@ -6,10 +6,13 @@ export const metadata = {
   title: "Dashboard | Dream Chat",
 };
 
+interface DashboardSearchParams {
+  checkoutId?: string;
+  [key: string]: string | string[] | undefined;
+}
+
 interface DashboardPageProps {
-  searchParams?: {
-    checkoutId?: string;
-  };
+  searchParams: Promise<DashboardSearchParams>;
 }
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
@@ -60,7 +63,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       badgeVariantClasses.outline
     }`;
 
-  const showCheckoutSuccess = Boolean(searchParams?.checkoutId);
+  const resolvedSearchParams = await searchParams;
+  const showCheckoutSuccess = Boolean(resolvedSearchParams.checkoutId);
 
   return (
     <main className="flex min-h-[70vh] flex-col gap-8 px-4 py-10 md:px-8 lg:px-12">

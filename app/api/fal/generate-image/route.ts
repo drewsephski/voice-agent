@@ -44,15 +44,52 @@ export async function POST(request: Request) {
       throw new Error('No image was generated');
     }
 
-    // Convert the image to a base64 URL for the client
-    const image = images[0];
-    const base64Image = Buffer.from(await image.arrayBuffer()).toString('base64');
-    const mimeType = providerMetadata?.fal?.images?.[0]?.content_type || 'image/png';
-    const imageUrl = `data:${mimeType};base64,${base64Image}`;
+        // Use image from Fal response.
+        const image = images[0];
 
-    return NextResponse.json({
-      imageUrl,
-    });
+        // Define narrow types for provider metadata instead of using `any`
+        type FalImageMeta = {
+          content_type?: string;
+        };
+        type FalProviderMeta = {
+          fal?: {
+            images?: FalImageMeta[];
+          };
+        };
+
+        const falMeta = providerMetadata as FalProviderMeta | undefined;
+        const metaImage = falMeta?.fal?.images?.[0];
+        const mimeType = metaImage?.content_type || 'image/png';
+
+        // Prefer direct URL fields that Fal may provide on the image object
+        type UrlImage = { url?: string; file?: string };
+        const urlImage = image as UrlImage;
+
+        if (typeof urlImage.url === 'string') {
+          return NextResponse.json({
+            imageUrl: urlImage.url,
+            mimeType,
+          });
+        }
+
+        if (typeof urlImage.file === 'string') {
+          return NextResponse.json({
+            imageUrl: urlImage.file,
+            mimeType,
+          });
+        }
+
+        // Fallback: if the image exposes a binary buffer-like `data`, encode it.
+        type BinaryImage = { data?: Uint8Array };
+        const binImage = image as BinaryImage;
+
+        if (binImage.data instanceof Uint8Array) {
+          const base64Image = Buffer.from(binImage.data).toString('base64');
+          const imageUrl = `data:${mimeType};base64,${base64Image}`;
+          return NextResponse.json({ imageUrl, mimeType });
+        }
+
+        throw new Error('Unsupported image format returned from Fal: missing url/file/data');
   } catch (error) {
     console.error('Error generating image:', error);
     return new NextResponse('Internal Server Error', { status: 500 });

@@ -69,7 +69,7 @@ export const Confirmation = ({
   state,
   ...props
 }: ConfirmationProps) => {
-  if (!approval || state === "input-streaming" || state === "input-available") {
+  if (!approval) {
     return null;
   }
 
@@ -96,8 +96,8 @@ export type ConfirmationRequestProps = {
 export const ConfirmationRequest = ({ children }: ConfirmationRequestProps) => {
   const { state } = useConfirmation();
 
-  // Only show when approval is requested
-  if (state !== "approval-requested") {
+  // Only show when approval is requested (use supported states)
+  if (state !== "input-streaming" && state !== "input-available") {
     return null;
   }
 
@@ -113,12 +113,10 @@ export const ConfirmationAccepted = ({
 }: ConfirmationAcceptedProps) => {
   const { approval, state } = useConfirmation();
 
-  // Only show when approved and in response states
+  // Only show when approved and in supported output states
   if (
     !approval?.approved ||
-    (state !== "approval-responded" &&
-      state !== "output-denied" &&
-      state !== "output-available")
+    (state !== "output-available" && state !== "output-error")
   ) {
     return null;
   }
@@ -135,12 +133,10 @@ export const ConfirmationRejected = ({
 }: ConfirmationRejectedProps) => {
   const { approval, state } = useConfirmation();
 
-  // Only show when rejected and in response states
+  // Only show when rejected and in supported output states
   if (
     approval?.approved !== false ||
-    (state !== "approval-responded" &&
-      state !== "output-denied" &&
-      state !== "output-available")
+    (state !== "output-available" && state !== "output-error")
   ) {
     return null;
   }
@@ -156,8 +152,8 @@ export const ConfirmationActions = ({
 }: ConfirmationActionsProps) => {
   const { state } = useConfirmation();
 
-  // Only show when approval is requested
-  if (state !== "approval-requested") {
+  // Only show when approval is requested (use supported states)
+  if (state !== "input-streaming" && state !== "input-available") {
     return null;
   }
 

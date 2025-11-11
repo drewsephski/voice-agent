@@ -433,7 +433,7 @@ export type PromptInputProps = Omit<
     message: string;
   }) => void;
   onSubmit: (
-    message: PromptInputMessage,
+    message: { text: string; files?: FileUIPart[] },
     event: FormEvent<HTMLFormElement>
   ) => void | Promise<void>;
 };
@@ -710,7 +710,13 @@ export const PromptInput = ({
       })
     ).then((convertedFiles: FileUIPart[]) => {
       try {
-        const result = onSubmit({ text, files: convertedFiles }, event);
+        const result = onSubmit(
+          {
+            text,
+            files: convertedFiles,
+          },
+          event
+        );
 
         // Handle both sync and async onSubmit
         if (result instanceof Promise) {
@@ -731,7 +737,7 @@ export const PromptInput = ({
             controller.textInput.clear();
           }
         }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         // Don't clear on error - user may want to retry
       }

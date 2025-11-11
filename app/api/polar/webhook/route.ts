@@ -13,8 +13,8 @@ async function sendRepoAccessEmail(params: {
   // Priority:
   const fromEmail =
     process.env.RESEND_FROM_EMAIL || 'Repo Access';
-
-  const repoUrl = env.PRIVATE_REPO_URL;
+ 
+   const repoUrl = process.env.PRIVATE_REPO_URL;
 
   if (!process.env.RESEND_API_KEY || !fromEmail || !repoUrl) {
     console.error('Resend/env misconfigured', {

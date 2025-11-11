@@ -1,3 +1,6 @@
+'use client';
+
+import { Suspense } from 'react';
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import {
@@ -8,8 +11,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useSearchParams } from 'next/navigation';
 
-export default function SuccessPage() {
+// Client component that uses useSearchParams
+function SuccessContentWrapper() {
+  const searchParams = useSearchParams();
+  const checkoutId = searchParams.get('checkoutId');
+  
+  return <SuccessContent checkoutId={checkoutId} />;
+}
+
+// Server component that doesn't use any client-side hooks
+function SuccessContent({ checkoutId }: { checkoutId: string | null }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-zinc-950 to-black text-zinc-100">
       <div className="relative mx-auto flex h-screen max-w-6xl gap-4 px-4 py-10 lg:gap-6 lg:px-6">
@@ -37,6 +50,11 @@ export default function SuccessPage() {
             </CardHeader>
             <CardContent className="text-center">
               <p className="mb-6 text-sm text-zinc-400">
+                {checkoutId && (
+                  <span className="block mb-2">
+                    Order ID: <span className="font-mono text-xs bg-zinc-800 px-2 py-1 rounded">{checkoutId}</span>
+                  </span>
+                )}
                 Access to the repository has been granted to your email address. You can now start using the chat interface.
               </p>
               <Button asChild>
@@ -47,5 +65,17 @@ export default function SuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950">
+        <div className="animate-pulse text-zinc-400">Loading order details...</div>
+      </div>
+    }>
+      <SuccessContentWrapper />
+    </Suspense>
   );
 }
