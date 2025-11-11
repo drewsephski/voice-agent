@@ -1,6 +1,8 @@
 
 'use client';
 
+// Note: Replace MONTHLY_PRODUCT_ID and ONETIME_PRODUCT_ID with actual Polar product IDs from the dashboard.
+
 import React from 'react';
 import { PlusIcon, ShieldCheckIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -10,6 +12,16 @@ import { cn } from '@/lib/utils';
 import { BorderTrail } from './border-trail';
 
 export function Pricing() {
+  // Pricing data with accurate calculations
+  const monthlyPrice = 7.99;
+  const originalMonthlyPrice = 12.99;
+  const monthlyDiscount = Math.round(((originalMonthlyPrice - monthlyPrice) / originalMonthlyPrice) * 100);
+  
+  // One-time purchase price (equivalent to ~12 months with additional discount)
+  const oneTimePrice = 79.99;
+  const yearlyPrice = monthlyPrice * 12;
+  const oneTimeDiscount = Math.round(((yearlyPrice - oneTimePrice) / yearlyPrice) * 100);
+
   return (
     <section className="relative min-h-screen overflow-hidden py-24">
       <div id="pricing" className="mx-auto w-full max-w-6xl space-y-5 px-4">
@@ -60,8 +72,8 @@ export function Pricing() {
                   <div className="flex items-center justify-between">
                     <h3 className="leading-none font-semibold text-foreground">Monthly</h3>
                     <div className="flex items-center gap-x-1">
-                      <span className="text-muted-foreground text-sm line-through">$12.99</span>
-                      <Badge variant="secondary">11% off</Badge>
+                      <span className="text-muted-foreground text-sm line-through">${originalMonthlyPrice.toFixed(2)}</span>
+                      <Badge variant="secondary">{monthlyDiscount}% off</Badge>
                     </div>
                   </div>
                   <p className="text-muted-foreground text-sm">Best value for growing businesses!</p>
@@ -70,12 +82,12 @@ export function Pricing() {
                   <div className="text-muted-foreground flex items-end gap-0.5 text-xl">
                     <span>$</span>
                     <span className="text-foreground -mb-0.5 text-4xl font-extrabold tracking-tighter md:text-5xl">
-                      7.99
+                      {monthlyPrice.toFixed(2)}
                     </span>
                     <span>/month</span>
                   </div>
                   <Button className="w-full text-foreground" variant="outline" asChild>
-                    <a href="#">Start your journey!</a>
+                    <a href="/api/polar/checkout?products=MONTHLY_PRODUCT_ID">Start your journey!</a>
                   </Button>
                 </div>
               </div>
@@ -91,8 +103,8 @@ export function Pricing() {
                   <div className="flex items-center justify-between">
                     <h3 className="leading-none font-semibold text-foreground">One-time purchase</h3>
                     <div className="flex items-center gap-x-1">
-                      <span className="text-muted-foreground text-sm line-through">$152.00</span>
-                      <Badge>One-time</Badge>
+                      <span className="text-muted-foreground text-sm line-through">${yearlyPrice.toFixed(2)}</span>
+                      <Badge>Save {oneTimeDiscount}%</Badge>
                     </div>
                   </div>
                   <p className="text-muted-foreground text-sm">Buy Once, use for all clients.</p>
@@ -101,11 +113,11 @@ export function Pricing() {
                   <div className="text-muted-foreground flex items-end text-xl">
                     <span>$</span>
                     <span className="text-foreground -mb-0.5 text-4xl font-extrabold tracking-tighter md:text-5xl">
-                      122.00
+                      {oneTimePrice.toFixed(2)}
                     </span>
                   </div>
                   <Button className="w-full" asChild>
-                    <a href="#">Get Now</a>
+                    <a href={`/api/polar/checkout?products=ONETIME_PRODUCT_ID`}>Get Now</a>
                   </Button>
                 </div>
               </div>

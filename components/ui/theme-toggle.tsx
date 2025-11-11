@@ -17,9 +17,8 @@ export function ThemeToggle() {
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className={cn(
         "inline-flex h-8 w-8 items-center justify-center rounded-full border text-[0px] transition-colors",
-        "border-zinc-700/60 bg-zinc-900/80 text-zinc-200 hover:bg-zinc-800",
-        "dark:border-zinc-700/80 dark:bg-zinc-900/90 dark:text-zinc-100",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        "border-border bg-card text-foreground hover:bg-accent hover:text-accent-foreground",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       )}
       aria-label="Toggle theme"
     >
