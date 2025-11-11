@@ -1,4 +1,4 @@
-"use client";
+
 
 import {
   Card,
@@ -56,6 +56,8 @@ const FEATURES_ONETIME = [
   "No recurring license fees",
   "Top-tier support & early feature access",
 ];
+
+export const dynamic = "force-dynamic";
 
 export default function PricingPage() {
   return (

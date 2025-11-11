@@ -1,4 +1,4 @@
-"use client";
+
 
 import {
   Card,
@@ -13,6 +13,7 @@ import { GradientHeading } from "@/components/ui/gradient-heading";
 import { ArrowRight, Zap, ShieldCheck, Users, Clock } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
 export default function About() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-muted/20 to-background text-foreground">
