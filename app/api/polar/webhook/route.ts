@@ -75,6 +75,8 @@ This link is for your use only. Please keep it private.`,
   }
 }
 
+import { upsertSubscriptionFromPolar } from '@/lib/billing/subscriptions';
+
 export const POST = Webhooks({
   webhookSecret: env.POLAR_WEBHOOK_SECRET,
 
@@ -103,31 +105,88 @@ export const POST = Webhooks({
   },
 
   onSubscriptionCreated: async (payload) => {
+    const subscription = payload.data;
+
     console.log('Polar webhook: subscription.created', {
-      id: payload.data.id,
-      customerEmail: payload.data.customer?.email,
-      productId: payload.data.productId,
-      status: payload.data.status,
+      id: subscription.id,
+      customerEmail: subscription.customer?.email,
+      productId: subscription.productId,
+      status: subscription.status,
+      currentPeriodEnd: subscription.currentPeriodEnd,
+    });
+
+    await upsertSubscriptionFromPolar({
+      polarSubscriptionId: subscription.id,
+      polarCustomerId: subscription.customer?.id,
+      email: subscription.customer?.email,
+      polarProductId: subscription.productId,
+      status: subscription.status,
+      currentPeriodEnd: subscription.currentPeriodEnd
+        ? new Date(subscription.currentPeriodEnd)
+        : null,
+      cancelAtPeriodEnd: subscription.cancelAtPeriodEnd ?? false,
+      canceledAt: subscription.canceledAt
+        ? new Date(subscription.canceledAt)
+        : null,
     });
   },
 
   onSubscriptionUpdated: async (payload) => {
+    const subscription = payload.data;
+
     console.log('Polar webhook: subscription.updated', {
-      id: payload.data.id,
-      customerEmail: payload.data.customer?.email,
-      productId: payload.data.productId,
-      status: payload.data.status,
-      currentPeriodEnd: payload.data.currentPeriodEnd,
+      id: subscription.id,
+      customerEmail: subscription.customer?.email,
+      productId: subscription.productId,
+      status: subscription.status,
+      currentPeriodEnd: subscription.currentPeriodEnd,
+      cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+      canceledAt: subscription.canceledAt,
+    });
+
+    await upsertSubscriptionFromPolar({
+      polarSubscriptionId: subscription.id,
+      polarCustomerId: subscription.customer?.id,
+      email: subscription.customer?.email,
+      polarProductId: subscription.productId,
+      status: subscription.status,
+      currentPeriodEnd: subscription.currentPeriodEnd
+        ? new Date(subscription.currentPeriodEnd)
+        : null,
+      cancelAtPeriodEnd: subscription.cancelAtPeriodEnd ?? false,
+      canceledAt: subscription.canceledAt
+        ? new Date(subscription.canceledAt)
+        : null,
     });
   },
 
   onSubscriptionCanceled: async (payload) => {
+    const subscription = payload.data;
+
     console.log('Polar webhook: subscription.canceled', {
-      id: payload.data.id,
-      customerEmail: payload.data.customer?.email,
-      productId: payload.data.productId,
-      canceledAt: payload.data.canceledAt,
+      id: subscription.id,
+      customerEmail: subscription.customer?.email,
+      productId: subscription.productId,
+      canceledAt: subscription.canceledAt,
+      currentPeriodEnd: subscription.currentPeriodEnd,
     });
-    // Implement: revoke access, notify user, update billing state, etc.
+
+    await upsertSubscriptionFromPolar({
+      polarSubscriptionId: subscription.id,
+      polarCustomerId: subscription.customer?.id,
+      email: subscription.customer?.email,
+      polarProductId: subscription.productId,
+      status: subscription.status,
+      currentPeriodEnd: subscription.currentPeriodEnd
+        ? new Date(subscription.currentPeriodEnd)
+        : null,
+      cancelAtPeriodEnd: subscription.cancelAtPeriodEnd ?? false,
+      canceledAt: subscription.canceledAt
+        ? new Date(subscription.canceledAt)
+        : null,
+    });
+
+    // Keep hook as extension point for additional side effects:
+    // revoke access, notify user, etc.
   },
 });

@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { cn } from "@/lib/utils";
+import { ClerkProvider } from '@clerk/nextjs';
 import { Header } from "@/components/ui/header-2";
-import { ClerkProvider } from '@clerk/nextjs'  
 import { LenisProvider } from '@/components/providers/lenis-provider';
 import { Footer } from '@/components/ui/footer';
 
@@ -38,15 +38,31 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    // Context7-guided debug log to ensure env wiring is correct at build/runtime
+    console.warn(
+      "[Clerk Debug] NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is missing. " +
+        "ClerkProvider cannot initialize. Check .env.local and restart dev server."
+    );
+  }
+
   return (
-    <html suppressHydrationWarning lang="en">
-      <body
-        className={cn(
-          bricolage.variable,
-          "bg-background text-foreground antialiased font-sans",
-        )}
-      >
-        <ClerkProvider>
+    <ClerkProvider
+      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      appearance={{
+        // Align with Clerk Next.js App Quickstart guidance
+        // and avoid Tailwind layer conflicts if using v4+
+        cssLayerName: "clerk",
+        baseTheme: undefined,
+      }}
+    >
+      <html suppressHydrationWarning lang="en">
+        <body
+          className={cn(
+            bricolage.variable,
+            "bg-background text-foreground antialiased font-sans",
+          )}
+        >
           <ThemeWrapper>
             <LenisProvider>
               <div className="flex min-h-screen flex-col">
@@ -58,8 +74,8 @@ export default function RootLayout({
               </div>
             </LenisProvider>
           </ThemeWrapper>
-        </ClerkProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

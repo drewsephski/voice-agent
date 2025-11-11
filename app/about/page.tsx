@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { TechBadge } from "@/components/ui/tech-badge";
 import { Button } from "@/components/ui/button";
 import { GradientHeading } from "@/components/ui/gradient-heading";
 import { ArrowRight, Zap, ShieldCheck, Users, Clock } from "lucide-react";
@@ -35,12 +35,9 @@ export default function About() {
       <main className="mx-auto flex max-w-6xl flex-col gap-12 px-4 pb-16 pt-16 lg:px-6">
         {/* 1) Hero / What We Are */}
         <section className="flex flex-col items-center gap-4 text-center">
-          <Badge
-            variant="secondary"
-            className="px-4 py-1 text-[10px] uppercase tracking-[0.18em]"
-          >
+          <TechBadge variant="secondary" className="uppercase tracking-[0.18em]" iconPosition="left">
             About Dream Chat
-          </Badge>
+          </TechBadge>
 
           <GradientHeading
             size="xl"

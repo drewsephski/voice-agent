@@ -6,7 +6,7 @@
 import React from 'react';
 import { PlusIcon, ShieldCheckIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Badge } from './badge';
+import { TechBadge } from './tech-badge';
 import { Button } from './button';
 import { cn } from '@/lib/utils';
 import { BorderTrail } from './border-trail';
@@ -73,7 +73,7 @@ export function Pricing() {
                     <h3 className="leading-none font-semibold text-foreground">Monthly</h3>
                     <div className="flex items-center gap-x-1">
                       <span className="text-muted-foreground text-sm line-through">${originalMonthlyPrice.toFixed(2)}</span>
-                      <Badge variant="secondary">{monthlyDiscount}% off</Badge>
+                      <TechBadge variant="premium" iconPosition="right">{monthlyDiscount}% off</TechBadge>
                     </div>
                   </div>
                   <p className="text-muted-foreground text-sm">Best value for growing businesses!</p>
@@ -104,7 +104,7 @@ export function Pricing() {
                     <h3 className="leading-none font-semibold text-foreground">One-time purchase</h3>
                     <div className="flex items-center gap-x-1">
                       <span className="text-muted-foreground text-sm line-through">${yearlyPrice.toFixed(2)}</span>
-                      <Badge>Save {oneTimeDiscount}%</Badge>
+                      <TechBadge variant="premium" iconPosition="right">Save {oneTimeDiscount}%</TechBadge>
                     </div>
                   </div>
                   <p className="text-muted-foreground text-sm">Buy Once, use for all clients.</p>

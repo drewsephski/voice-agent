@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ConsistentBadge } from "@/components/ui/consistent-badge";
+import { TechBadge } from "@/components/ui/tech-badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -21,9 +21,9 @@ export default function Features() {
       {/* Hero Section */}
       <section className="relative mx-auto max-w-7xl px-4 py-16 md:px-6 lg:px-8">
         <div className="text-center space-y-6">
-          <ConsistentBadge variant="secondary">
+          <TechBadge variant="default" className="uppercase tracking-[0.18em]" iconPosition="left">
             Features
-          </ConsistentBadge>
+          </TechBadge>
           <h1 className="text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">
             Everything you need to
             <span className="block text-primary">deploy AI Voice Agents with confidence</span>

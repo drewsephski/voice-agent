@@ -20,59 +20,146 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const rawProducts = url.searchParams.getAll('products');
 
-  // If nothing provided, default to monthly product placeholder
+  // Default to MONTHLY placeholder if nothing provided
   const inputProducts = rawProducts.length ? rawProducts : ['MONTHLY_PRODUCT_ID'];
 
-  // Map placeholders to env-backed UUIDs
+  // Map placeholders -> actual IDs from env
   const mapped = inputProducts.map((p) => {
     if (p === 'MONTHLY_PRODUCT_ID') return env.POLAR_PRODUCT_ID_MONTHLY;
     if (p === 'ONETIME_PRODUCT_ID') return env.POLAR_PRODUCT_ID_ONETIME;
     return p;
   });
 
-  // Validate: no unresolved placeholders, all IDs present
-  if (
+  // Validate configuration robustness:
+  // - Require access token
+  // - Require NEXT_PUBLIC_APP_URL
+  // - Require at least one valid mapped product ID
+  if (!env.POLAR_ACCESS_TOKEN) {
+    console.error('[polar][checkout] Missing POLAR_ACCESS_TOKEN');
+    return Response.json(
+      { error: 'Polar checkout misconfigured: missing POLAR_ACCESS_TOKEN' },
+      { status: 500 }
+    );
+  }
+
+  if (!env.NEXT_PUBLIC_APP_URL) {
+    console.error('[polar][checkout] Missing NEXT_PUBLIC_APP_URL');
+    return Response.json(
+      { error: 'Polar checkout misconfigured: missing NEXT_PUBLIC_APP_URL' },
+      { status: 500 }
+    );
+  }
+
+  const invalidProducts =
     mapped.length === 0 ||
     mapped.some(
       (id) =>
         !id ||
         id === 'MONTHLY_PRODUCT_ID' ||
         id === 'ONETIME_PRODUCT_ID'
-    )
-  ) {
-    console.error('Invalid or unresolved Polar product IDs:', {
+    );
+
+  if (invalidProducts) {
+    console.error('[polar][checkout] Invalid or unresolved Polar product IDs', {
       inputProducts,
       mapped,
+      POLAR_PRODUCT_ID_MONTHLY: env.POLAR_PRODUCT_ID_MONTHLY,
+      POLAR_PRODUCT_ID_ONETIME: env.POLAR_PRODUCT_ID_ONETIME,
     });
-    return new Response(
-      JSON.stringify({ error: 'Invalid product configuration' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
+
+    // Explicit 400 so it's obvious in Network tab, not a generic 500
+    return Response.json(
+      {
+        error:
+          'Invalid Polar product configuration. Check POLAR_PRODUCT_ID_MONTHLY / POLAR_PRODUCT_ID_ONETIME and query parameters.',
+      },
+      { status: 400 }
     );
   }
 
-  // Rewrite query to contain only real UUIDs so Polar SDK reads them correctly
+  // Rewrite query to contain only real UUIDs so @polar-sh/nextjs reads them
   url.searchParams.delete('products');
   for (const id of mapped) {
     url.searchParams.append('products', id);
   }
 
-  // Build Checkout config ONLY with documented fields.
-  // Products are provided via query params above.
+  const successUrl = `${env.NEXT_PUBLIC_APP_URL}/dashboard?checkoutId={CHECKOUT_ID}`;
+  const returnUrl = `${env.NEXT_PUBLIC_APP_URL}/checkout/error`;
+
+  // Final sanity check to avoid "Invalid URL" from undefined/empty pieces
+  try {
+    // Ensure these are valid absolute URLs
+    new URL(successUrl);
+    new URL(returnUrl);
+  } catch (err) {
+    console.error('[polar][checkout] Invalid success/return URL', {
+      successUrl,
+      returnUrl,
+      err,
+    });
+    return Response.json(
+      { error: 'Polar checkout misconfigured: invalid success/return URL' },
+      { status: 500 }
+    );
+  }
+
   const config = {
     accessToken: env.POLAR_ACCESS_TOKEN,
     server: env.POLAR_ENVIRONMENT,
-    successUrl: `${env.NEXT_PUBLIC_APP_URL}/checkout/success?checkoutId={CHECKOUT_ID}`,
-    returnUrl: `${env.NEXT_PUBLIC_APP_URL}/checkout/error`,
+    successUrl,
+    returnUrl,
+    // ensure redirect (non-embed) behavior
+    includeCheckoutId: true,
   } as Parameters<typeof Checkout>[0];
 
-  const handler = Checkout(config);
+  let handler: (req: NextRequest) => Promise<Response>;
 
-  // Call handler with patched URL, so Polar sees UUIDs instead of placeholders
+  try {
+    handler = Checkout(config);
+  } catch (err) {
+    console.error('[polar][checkout] Failed to initialize Checkout handler', {
+      err,
+      config: {
+        hasAccessToken: !!env.POLAR_ACCESS_TOKEN,
+        server: env.POLAR_ENVIRONMENT,
+      },
+    });
+    return Response.json(
+      { error: 'Failed to initialize Polar checkout handler' },
+      { status: 500 }
+    );
+  }
+
+  // Call handler with patched URL (UUID products), let it perform the redirect.
   const patchedRequest = new Request(url.toString(), {
     method: request.method,
     headers: request.headers,
     body: request.body,
   });
 
-  return handler(patchedRequest as unknown as NextRequest);
+  try {
+    const response = await handler(patchedRequest as unknown as NextRequest);
+
+    // If Polar returns non-redirect, surface details to help debugging
+    if (
+      response.status < 300 ||
+      response.status >= 400 ||
+      !response.headers.get('location')
+    ) {
+      const text = await response.text().catch(() => '');
+      console.error('[polar][checkout] Unexpected response from Polar handler', {
+        status: response.status,
+        location: response.headers.get('location'),
+        body: text,
+      });
+    }
+
+    return response;
+  } catch (err) {
+    console.error('[polar][checkout] Error during checkout handler', { err });
+    return Response.json(
+      { error: 'Unexpected error while creating Polar checkout' },
+      { status: 500 }
+    );
+  }
 }
