@@ -3,9 +3,6 @@ import { redirect } from "next/navigation";
 import { getCurrentPlanForUser } from "@/lib/billing/subscriptions";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { ImageGenerationForm } from "@/components/image-generation-form";
 
 export const metadata = {

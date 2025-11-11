@@ -80,7 +80,7 @@ export const MessageAction = ({
   children,
   label,
   variant = "ghost",
-  size = "icon-sm",
+  size = "icon",
   ...props
 }: MessageActionProps) => {
   const button = (
@@ -190,12 +190,12 @@ export const MessageBranchContent = ({
   const { currentBranch, setBranches, branches } = useMessageBranch();
   const childrenArray = Array.isArray(children) ? children : [children];
 
-  // Use useEffect to update branches when they change
   useEffect(() => {
     if (branches.length !== childrenArray.length) {
       setBranches(childrenArray);
     }
-  }, [childrenArray, branches, setBranches]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [childrenArray.length]);
 
   return childrenArray.map((branch, index) => (
     <div
@@ -212,12 +212,10 @@ export const MessageBranchContent = ({
 };
 
 export type MessageBranchSelectorProps = HTMLAttributes<HTMLDivElement> & {
-  from: UIMessage["role"];
+  from?: UIMessage["role"];
 };
 
 export const MessageBranchSelector = ({
-  className,
-  from,
   ...props
 }: MessageBranchSelectorProps) => {
   const { totalBranches } = useMessageBranch();
@@ -249,7 +247,7 @@ export const MessageBranchPrevious = ({
       aria-label="Previous branch"
       disabled={totalBranches <= 1}
       onClick={goToPrevious}
-      size="icon-sm"
+      size="icon"
       type="button"
       variant="ghost"
       {...props}
@@ -263,7 +261,6 @@ export type MessageBranchNextProps = ComponentProps<typeof Button>;
 
 export const MessageBranchNext = ({
   children,
-  className,
   ...props
 }: MessageBranchNextProps) => {
   const { goToNext, totalBranches } = useMessageBranch();
@@ -273,7 +270,7 @@ export const MessageBranchNext = ({
       aria-label="Next branch"
       disabled={totalBranches <= 1}
       onClick={goToNext}
-      size="icon-sm"
+      size="icon"
       type="button"
       variant="ghost"
       {...props}

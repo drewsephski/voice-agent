@@ -15,7 +15,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen" aria-label="Dashboard layout">
       {/* Sidebar */}
       <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 border-r border-border">
         <div className="flex flex-col flex-grow pt-5 bg-background overflow-y-auto">
